@@ -14,8 +14,8 @@ This is Nodejs backend number 1 from my backend collection project. This backend
 1. install all requirements
 2. clone repository
 3. at repository root directory (same level as README.md):
-    1. switch to branch develop-nodejs-1 with `git checkout -b develop-nodejs-1` then `git pull origin develop-nodejs-1`
-    2. install required node modules with `npm install`
+    1. switch to branch release-1.0 with `git checkout release-1.0`
+    2. install required node modules with `npm ci`
     3. create file .env with contents:
 
     ```

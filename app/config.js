@@ -1,3 +1,6 @@
+/*
+config - containing all loaded configuration from environment variable
+*/
 var config = {
   express: {
     port: process.env.EXPRESS_PORT,
