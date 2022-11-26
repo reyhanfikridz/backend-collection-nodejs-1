@@ -1,0 +1,37 @@
+{
+  "name": "backend-collection-private",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "nodemon ./app/server.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "verbose": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reyhanfikridz/backend-collection-private.git"
+  },
+  "author": "reyhanfikridz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reyhanfikridz/backend-collection-private/issues"
+  },
+  "homepage": "https://github.com/reyhanfikridz/backend-collection-private#readme",
+  "dependencies": {
+    "bole": "^5.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jest": "^29.3.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.20",
+    "pg": "^8.8.0",
+    "supertest": "^6.3.1"
+  }
+}
