@@ -1,6 +1,6 @@
 # backend-collection-nodejs-1
 
-### Version: release-1.0
+### Version: release-1.0 (2022-11-27)
 
 ### Summary:
 This is Nodejs backend number 1 from my backend collection project. This backend is a REST API for CRUD worker data build with Express framework and PostgreSQL database, also tested with Jest framework.
