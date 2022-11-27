@@ -1,5 +1,5 @@
 /*
-testing for worker/router
+worker/router test - containing class for testing worker router
 */
 // set env first
 require('dotenv').config()
@@ -22,14 +22,6 @@ class WorkerRouterTest
   // run test
   run()
   {
-    // set things before running all test in this file
-    beforeAll(done => {
-      // truncate table worker
-      this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE", ()=>{
-        done()
-      })
-    })
-
     // run all test
     this.testPost()
     this.testGet()
@@ -37,13 +29,9 @@ class WorkerRouterTest
     this.testPatch()
     this.testDelete()
 
-    // set things after running all test in this file
-    afterAll(done => {
-      // truncate table worker and disconnect database
-      this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE", ()=>{
-        this.server.db.pool.end()
-        done()
-      })
+    // close database connection after testing
+    afterAll(async () => {
+      await this.server.db.pool.end()
     })
   }
 
@@ -65,9 +53,6 @@ class WorkerRouterTest
         // check expected result
         expect(response.status).toEqual(201)
         expect(response.type).toEqual('application/json')
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
 
       // testing status 500
@@ -110,9 +95,6 @@ class WorkerRouterTest
         // check expected result
         expect(response.status).toEqual(200)
         expect(response.body.data).toEqual(addedWorker)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
 
       // test failed
@@ -131,9 +113,6 @@ class WorkerRouterTest
 
         // check expected result
         expect(response.status).toEqual(500)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
     })
 
@@ -171,16 +150,25 @@ class WorkerRouterTest
 
         addedWorkers.push(response.body.added_data)
 
-        // get data list
         response = await this.testingApp
-          .get('/api/workers/')
+          .post('/api/workers/')
+          .field('full_name', 'William Penz')
+          .field('salary', '22000000')
+          .field('joining_date', '2020-02-10 09:00')
+          .field('department', 'Engineer')
+
+        addedWorkers.push(response.body.added_data)
+
+        // get data list with department 'Engineer'
+        response = await this.testingApp
+          .get('/api/workers/?department=Engineer')
+        let gettedWorkers = response.body.data
 
         // check expected result
         expect(response.status).toEqual(200)
-        expect(response.body.data).toEqual(addedWorkers)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
+        for (let i = 0; i < gettedWorkers.length; i++) {
+          expect(gettedWorkers[i]['department']).toEqual('Engineer')
+        }
       })
     })
   }
@@ -220,9 +208,6 @@ class WorkerRouterTest
         // check expected result
         expect(replaceWorkerRespStatus).toEqual(200)
         expect(response.body.data).toEqual(replacedWorker)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
 
       // test failed
@@ -245,9 +230,6 @@ class WorkerRouterTest
 
         // check expected result
         expect(response.status).toEqual(500)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
     })
   }
@@ -332,9 +314,6 @@ class WorkerRouterTest
         for (let i = 0; i < updatedWorker.length; i++) {
           expect(gettedWorker[i]).toEqual(updatedWorker[i])
         }
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
 
       // test failed
@@ -352,9 +331,6 @@ class WorkerRouterTest
           .patch(`/api/workers/test/`)
           .field('full_name', 'John Wick')
           .expect(500)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
     })
   }
@@ -366,10 +342,7 @@ class WorkerRouterTest
     describe('Test API delete worker by ID (DELETE /api/workers/)', () => {
       // test success
       it('should return status 200 and return the right data', async () => {
-        let addedWorkers = []
-        let gettedWorkers = []
-
-        // add data list
+        // add data
         let response = await this.testingApp
           .post('/api/workers/')
           .field('full_name', 'James Bond')
@@ -377,42 +350,21 @@ class WorkerRouterTest
           .field('joining_date', '2022-11-21 18:00')
           .field('department', 'Spy')
 
-        addedWorkers.push(response.body.added_data)
-
-        response = await this.testingApp
-          .post('/api/workers/')
-          .field('full_name', 'Michael Thomas')
-          .field('salary', '550000500.50')
-          .field('joining_date', '2019-11-11 10:00')
-          .field('department', 'Project Leader')
-
-        addedWorkers.push(response.body.added_data)
-
-        response = await this.testingApp
-          .post('/api/workers/')
-          .field('full_name', 'William McWallen')
-          .field('salary', '20000000')
-          .field('joining_date', '2021-05-20 11:00')
-          .field('department', 'Engineer')
-
-        addedWorkers.push(response.body.added_data)
+        let addedWorker = response.body.added_data
 
         // delete data and check expected status
         await this.testingApp
-          .delete(`/api/workers/${addedWorkers[1].id}`)
+          .delete(`/api/workers/${addedWorker.id}`)
           .expect(200)
 
-        // get data list
+        // get data
         response = await this.testingApp
-          .get('/api/workers/')
+          .get(`/api/workers/${addedWorker.id}/`)
 
-        gettedWorkers = response.body.data
+        let gettedWorker = response.body.data
 
         // check expected list data after delete
-        expect(gettedWorkers).toEqual([addedWorkers[0], addedWorkers[2]])
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
+        expect(gettedWorker).toEqual({})
       })
 
       // test failed
@@ -429,9 +381,6 @@ class WorkerRouterTest
         response = await this.testingApp
           .delete(`/api/workers/test/`)
           .expect(500)
-
-        // truncate table worker
-        await this.server.db.pool.query("TRUNCATE TABLE worker RESTART IDENTITY CASCADE")
       })
     })
   }

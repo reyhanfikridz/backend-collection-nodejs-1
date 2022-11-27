@@ -1,16 +1,13 @@
 /*
-worker/router - initialization of worker router
+wroker/router - containing class for worker router
 */
 // import all required module
-var bole = require('bole')
-bole.output({
-  level: 'error',
-  stream: process.stdout
-})
 var express = require('express')
+var WorkerModel = require('./model')
+var Log = require('./../log')
 
-var workerModel = require('./model')
-var log = bole('order/router')
+// set log for this file
+var log = new Log('order/router', 'info')
 
 // class WorkerRouter
 class WorkerRouter
@@ -19,22 +16,38 @@ class WorkerRouter
   constructor(db)
   {
     this.db = db
+    this.workerModel = new WorkerModel(this.db.pool)
+
     this.router = express.Router()
+    this.router.post('/workers/', this.addWorkerHandler)
     this.router.get('/workers/', this.getWorkersHandler)
     this.router.get('/workers/:id/', this.getWorkerHandler)
-    this.router.post('/workers/', this.addWorkerHandler)
     this.router.put('/workers/:id/', this.replaceWorkerHandler)
     this.router.patch('/workers/:id/', this.updateWorkerHandler)
     this.router.delete('/workers/:id/', this.deleteWorkerHandler)
   }
 
+  // handler for add new worker data (Method: POST)
+  addWorkerHandler = async (req, res) => {
+    try {
+      let worker = await this.workerModel.insert(req.body)
+      res.status(201).json({
+        'message': "Worker data added!",
+        'added_data': worker || {}
+      })
+    } catch (error) {
+      log.log.error(error)
+      res.status(500).json({'message': error})
+    }
+  }
+
   // handler for get all worker data (Method: GET)
   getWorkersHandler = async (req, res) => {
     try {
-      let workers = await workerModel.getAll(this.db.pool)
+      let workers = await this.workerModel.getAll(req.query)
       res.status(200).json({'data': workers})
     } catch (error) {
-      log.error(error)
+      log.log.error(error)
       res.status(500).json({'message': error})
     }
   }
@@ -43,24 +56,10 @@ class WorkerRouter
   getWorkerHandler = async (req, res) => {
     try {
       const id = parseInt(req.params['id'])
-      let worker = await workerModel.getById(this.db.pool, id)
+      let worker = await this.workerModel.getById(id)
       res.status(200).json({'data': worker || {}})
     } catch (error) {
-      log.error(error)
-      res.status(500).json({'message': error})
-    }
-  }
-
-  // handler for add new worker data (Method: POST)
-  addWorkerHandler = async (req, res) => {
-    try {
-      let worker = await workerModel.insert(this.db.pool, req.body)
-      res.status(201).json({
-        'message': "Worker data added!",
-        'added_data': worker || {}
-      })
-    } catch (error) {
-      log.error(error)
+      log.log.error(error)
       res.status(500).json({'message': error})
     }
   }
@@ -69,13 +68,13 @@ class WorkerRouter
   replaceWorkerHandler = async (req, res) => {
     try {
       const id = parseInt(req.params['id'])
-      let worker = await workerModel.updateAllFieldsById(this.db.pool, id, req.body)
+      let worker = await this.workerModel.updateAllFieldsById(id, req.body)
       res.status(200).json({
         'message': "Worker data replaced!",
         'replaced_data': worker || {}
       })
     } catch (error) {
-      log.error(error)
+      log.log.error(error)
       res.status(500).json({'message': error})
     }
   }
@@ -84,13 +83,13 @@ class WorkerRouter
   updateWorkerHandler = async (req, res) => {
     try {
       const id = parseInt(req.params['id'])
-      let worker = await workerModel.updateById(this.db.pool, id, req.body)
+      let worker = await this.workerModel.updateById(id, req.body)
       res.status(200).json({
         'message': "Worker data updated!",
         'updated_data': worker || {}
       })
     } catch (error) {
-      log.error(error)
+      log.log.error(error)
       res.status(500).json({'message': error})
     }
   }
@@ -99,12 +98,12 @@ class WorkerRouter
   deleteWorkerHandler = async (req, res) => {
     try {
       const id = parseInt(req.params['id'])
-      let successMessage = await workerModel.deleteById(this.db.pool, id)
+      let successMessage = await this.workerModel.deleteById(id)
       res.status(200).json({
         'message': successMessage,
       })
     } catch (error) {
-      log.error(error)
+      log.log.error(error)
       res.status(500).json({'message': error})
     }
   }
