@@ -39,8 +39,13 @@ This is Nodejs backend number 1 from my backend collection project. This backend
     ```
 
     4. create postgresql databases with name same as in .env file
-    5. test server first with `npm test` to make sure server works fine
-    6. run server with `npm start`
+    5. migrate database tables with `npm run migrate` and migrate database test tables with `npm run migrate test`
+    6. test server first with `npm test` to make sure server works fine
+    7. run server with `npm start`
+
+### API collection:
+1. Go to https://www.postman.com/reyhanfikri/workspace/backend-collection-nodejs-1/overview
+2. Choose `release-1.0` collection
 
 ### License:
 This project is MIT license, so basically you can use it for personal or commercial use as long as the original LICENSE.md included in your project.

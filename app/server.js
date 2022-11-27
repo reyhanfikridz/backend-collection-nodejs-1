@@ -16,27 +16,16 @@ class Server
   // constructor
   constructor()
   {
+    // init db connection and express application
     this.db = new DB(config.pg)
     this.app = new App(config.express, this.db)
   }
 
-  // init DB connection and express app
+  // init express app middlewares and routers
   init()
   {
-    // init db tables
-    this.db.initTables()
-      .then((error)=>{
-        //// if init db tables success, init express app middlewares and routers
-        if (!error) {
-          this.app.initMiddlewares()
-          this.app.initRouters()
-
-        //// if init db tables failed, log error and exit program
-        } else {
-          log.log.error("There's an error when initialize database => ", error)
-          process.exit(1)
-        }
-      })
+    this.app.initMiddlewares()
+    this.app.initRouters()
   }
 }
 
