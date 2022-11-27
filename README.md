@@ -6,13 +6,13 @@
 This is Nodejs backend number 1 from my backend collection project. This backend is a REST API for CRUD worker data build with Express framework and PostgreSQL database, also tested with Jest framework.
 
 ### Requirements:
-1. nodejs (tested: v14.17.5)
-2. npm (tested: v6.14.14)
-2. postgresql (tested: v13.4)
+1. nodejs (tested: v14.17.5, v18.12.1)
+2. npm (tested: v6.14.14, v8.19.2)
+3. postgresql (tested: v13.4, v13.8)
 
 ### Steps to run the backend server:
 1. install all requirements
-2. clone repository
+2. clone repository `https://github.com/reyhanfikridz/backend-collection-nodejs-1`
 3. at repository root directory (same level as README.md):
     1. switch to branch release-1.0 with `git checkout release-1.0`
     2. install required node modules with `npm ci`
@@ -27,7 +27,7 @@ This is Nodejs backend number 1 from my backend collection project. This backend
     POSTGRES_DATABASE="<server postgres database name, example: backend_collection_nodejs_1>"
     POSTGRES_DATABASE_TEST="<server postgres testing database name, example: backend_collection_nodejs_1_test>"
     POSTGRES_HOST="<server postgres host, example: localhost>"
-    POSTGRES_PORT=<server postgres host, example: 5432>
+    POSTGRES_PORT=<server postgres port, example: 5432>
 
     # NODE ENV, change it to "test" if you want to do testing 
     # so it will use POSTGRES_DATABASE_TEST,
